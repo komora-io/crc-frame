@@ -1,7 +1,12 @@
 [package]
 name = "crc-frame"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+authors = ["Tyler Neely <t@jujit.su>"]
+description = "simple functions for reading and writing crc32'd framed buffers"
+license = "GPL-3.0"
+repository = "https://github.com/komora-io/crc-frame"
+documentation = "https://docs.rs/crc-frame/"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
