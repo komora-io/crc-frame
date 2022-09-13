@@ -65,8 +65,7 @@ fn uninit_boxed_slice(len: usize) -> Box<[u8]> {
     }
 }
 
-/// Read a frame out of the provided Read implementation and into the provided `Read`
-/// implementation.
+/// Read a frame out of the provided `Read` implementation.
 pub fn read_frame<R: io::Read>(mut from: R, max_len: usize) -> io::Result<Box<[u8]>> {
     let header = &mut [0; MAX_HEADER_SIZE];
 
@@ -119,7 +118,7 @@ pub fn read_frame<R: io::Read>(mut from: R, max_len: usize) -> io::Result<Box<[u
     Ok(buf)
 }
 
-/// Read a frame out of the provided Read implementation and into the provided `File`
+/// Read a frame out of the provided `File`
 pub fn read_frame_at(file: &fs::File, at: u64, max_len: usize) -> io::Result<Box<[u8]>> {
     const FIRST_READ_SIZE: usize = 128;
 
