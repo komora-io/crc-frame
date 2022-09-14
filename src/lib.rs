@@ -208,7 +208,7 @@ pub fn frame_header(buf: &[u8]) -> ([u8; MAX_HEADER_SIZE], usize) {
     let mut header_buf = [0_u8; MAX_HEADER_SIZE];
 
     // write the buf len varint into the header buffer
-    let bytes_for_varint = varint::serialize_into(buf.len() as u64, &mut header_buf);
+    let bytes_for_varint = varint::serialize_into(buf.len() as u64, &mut header_buf).unwrap();
 
     let crc_start = bytes_for_varint;
     let crc_end = bytes_for_varint + 4;
