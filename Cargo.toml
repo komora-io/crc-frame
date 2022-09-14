@@ -1,6 +1,6 @@
 [package]
 name = "crc-frame"
-version = "1.0.4"
+version = "1.0.5"
 edition = "2021"
 authors = ["Tyler Neely <t@jujit.su>"]
 description = "simple functions for reading and writing crc32'd framed buffers"
