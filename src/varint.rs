@@ -44,7 +44,7 @@ macro_rules! check_buf_len {
 /// provided buffer and returns how many bytes the
 /// corresponding varint consumed. If the buffer is
 /// not large enough, returns `UnexpectedEof`.
-pub fn serialize_into(int: u64, buf: &mut [u8]) -> io::Result<usize> {
+pub fn serialize_into_buf(int: u64, buf: &mut [u8]) -> io::Result<usize> {
     Ok(if int <= 240 {
         check_buf_len!(buf, 1);
         buf[0] = u8::try_from(int).unwrap();
@@ -97,6 +97,15 @@ pub fn serialize_into(int: u64, buf: &mut [u8]) -> io::Result<usize> {
         buf[1..9].copy_from_slice(&bytes[..8]);
         9
     })
+}
+
+/// Write a varint into the provided `Write` and return the
+/// size of the encoded varint that was written into it.
+pub fn serialize_into_writer<W: io::Write>(int: u64, mut writer: W) -> io::Result<usize> {
+    let buf = &mut [0; 9];
+    let size = serialize_into_buf(int, buf)?;
+    writer.write_all(&buf[..size])?;
+    Ok(size)
 }
 
 /// Attempts to read a varint-encoded `u64` out of the provided buffer
