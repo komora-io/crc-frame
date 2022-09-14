@@ -3,7 +3,7 @@
 //! * Uses varint for frame sizing
 //! * Tested against libfuzzer
 
-mod varint;
+pub mod varint;
 
 use std::fs;
 use std::io;

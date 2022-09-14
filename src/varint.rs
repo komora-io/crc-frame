@@ -3,6 +3,29 @@ use std::io;
 
 use fault_injection::annotate;
 
+/// Returns the number of bytes that this varint will need
+pub const fn size(int: u64) -> usize {
+    if int <= 240 {
+        1
+    } else if int <= 2287 {
+        2
+    } else if int <= 67823 {
+        3
+    } else if int <= 0x00FF_FFFF {
+        4
+    } else if int <= 0xFFFF_FFFF {
+        5
+    } else if int <= 0x00FF_FFFF_FFFF {
+        6
+    } else if int <= 0xFFFF_FFFF_FFFF {
+        7
+    } else if int <= 0x00FF_FFFF_FFFF_FFFF {
+        8
+    } else {
+        9
+    }
+}
+
 /// Returns how many bytes the varint consumed while serializing
 pub fn serialize_into(int: u64, buf: &mut [u8]) -> usize {
     if int <= 240 {
