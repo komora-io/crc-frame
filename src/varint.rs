@@ -101,11 +101,38 @@ pub fn serialize_into_buf(int: u64, buf: &mut [u8]) -> io::Result<usize> {
 
 /// Write a varint into the provided `Write` and return the
 /// size of the encoded varint that was written into it.
-pub fn serialize_into_writer<W: io::Write>(int: u64, mut writer: W) -> io::Result<usize> {
+pub fn serialize_into_write<W: io::Write>(int: u64, mut write: W) -> io::Result<usize> {
     let buf = &mut [0; 9];
     let size = serialize_into_buf(int, buf)?;
-    writer.write_all(&buf[..size])?;
+    write.write_all(&buf[..size])?;
     Ok(size)
+}
+
+/// Attempt to read a varint-encided `u64` out of a provided `Read` implementation.
+pub fn deserialize_from_read<R: io::Read>(mut read: R) -> io::Result<u64> {
+    let buf = &mut [0_u8; 9];
+    read.read_exact(&mut buf[..1])?;
+
+    let res = match buf[0] {
+        0..=240 => u64::from(buf[0]),
+        241..=248 => {
+            read.read_exact(&mut buf[1..2])?;
+            240 + 256 * (u64::from(buf[0]) - 241) + u64::from(buf[1])
+        }
+        249 => {
+            read.read_exact(&mut buf[1..3])?;
+            2288 + 256 * u64::from(buf[1]) + u64::from(buf[2])
+        }
+        other => {
+            let sz = other as usize - 247;
+            read.read_exact(&mut buf[1..=sz])?;
+            let mut aligned = [0; 8];
+            aligned[..sz].copy_from_slice(&buf[1..=sz]);
+            u64::from_le_bytes(aligned)
+        }
+    };
+
+    Ok(res)
 }
 
 /// Attempts to read a varint-encoded `u64` out of the provided buffer
