@@ -203,7 +203,7 @@ fn hash(buf: &[u8], len_bytes: &[u8]) -> [u8; 4] {
 /// out.extend_from_slice(buf);
 /// ```
 pub fn frame_header(buf: &[u8]) -> ([u8; MAX_HEADER_SIZE], usize) {
-    let mut header_buf = [0_u8; 4 + 9];
+    let mut header_buf = [0_u8; MAX_HEADER_SIZE];
 
     // write the buf len varint into the header buffer
     let bytes_for_varint = varint::serialize_into(buf.len() as u64, &mut header_buf);
