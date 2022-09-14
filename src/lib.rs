@@ -120,7 +120,7 @@ pub fn read_frame<R: io::Read>(mut from: R, max_len: usize) -> io::Result<Box<[u
 
 /// Read a frame out of the provided `File`
 pub fn read_frame_at(file: &fs::File, at: u64, max_len: usize) -> io::Result<Box<[u8]>> {
-    const FIRST_READ_SIZE: usize = 128;
+    const FIRST_READ_SIZE: usize = 512;
 
     let header = &mut [0; FIRST_READ_SIZE];
 
