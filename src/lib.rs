@@ -1,7 +1,9 @@
 //! Simple tools for reading and writing crc-checked frames of bytes.
-//! * Uses crc32fast for a 4-byte crc.
+//! * Uses crc32fast for a 4-byte crc
 //! * Uses varint for frame sizing
 //! * Tested against libfuzzer
+//!
+//! The `varint` module is also public for direct use.
 
 pub mod varint;
 
