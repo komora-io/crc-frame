@@ -1,30 +1,38 @@
 #![no_main]
+
+use std::io::Write;
+
 use libfuzzer_sys::fuzz_target;
 
-use crc_frame::{parse_frame, read_frame, read_frame_at, write_frame, write_frame_at};
+use crc_frame::{parse_frame, read_frame_at, read_frame_from, write_frame_at, write_frame_into};
 
-fuzz_target!(|data: &[u8]| {
-    //println!("using input: {data:?}");
+fuzz_target!(|data: Vec<Vec<u8>>| {
+    // println!("------------------------- new test -----------------------------");
+    // println!("using input: {data:?}");
     let mut buf = vec![];
 
-    write_frame(data, &mut buf).unwrap();
+    for datum in &data {
+        // println!("writing datum {:?} at offset {}", datum, buf.len());
+        let written = write_frame_into(&mut buf, &datum).unwrap();
+        // println!("wrote buffer of len {}", written);
+    }
 
-    let (begin, end) = parse_frame(&buf).unwrap();
+    let mut read_buf_1: &[u8] = &buf;
+    let mut read_buf_2: &[u8] = &buf;
+    // println!("read buf has total len {}", read_buf.len());
 
-    assert_eq!(&buf[begin..end], data);
+    for datum in &data {
+        // println!("reading");
+        let (begin, end) = parse_frame(read_buf_1).unwrap();
+        // println!("begin: {begin}, end: {end}");
 
-    let mut options = std::fs::OpenOptions::new();
-    options.create(true).read(true).write(true);
-    let mut file = options.open("fuzz_file").unwrap();
+        assert_eq!(&read_buf_1[begin..end], datum);
+        // println!("got one, advancing buf to {end}");
 
-    write_frame_at(data, &file, 7).unwrap();
-    let rt_1 = read_frame_at(&file, 7, data.len() + 13).unwrap();
+        read_buf_1 = &read_buf_1[end..];
 
-    assert_eq!(&*rt_1, data);
+        let read_2 = read_frame_from(&mut read_buf_2, datum.len()).unwrap();
 
-    use std::io::Seek;
-    file.seek(std::io::SeekFrom::Start(7)).unwrap();
-    let rt_2 = read_frame(&mut file, data.len() + 13).unwrap();
-
-    assert_eq!(&*rt_2, data);
+        assert_eq!(&*read_2, datum);
+    }
 });
